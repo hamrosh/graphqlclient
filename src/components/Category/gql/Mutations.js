@@ -7,3 +7,10 @@ export const ADD_CATEGORY = gql`
     }
   }
 `;
+export const DELETE_CATEGORY = gql`
+  mutation delCategory($id: ID) {
+    delCategory(id: $id) {
+      message
+    }
+  }
+`;

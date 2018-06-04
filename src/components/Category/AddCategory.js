@@ -11,25 +11,53 @@ import { GET_CATEGORY_LIST } from './gql/Queries';
 import ReactTable from 'react-table';
 //import for react - table css
 import 'react-table/react-table.css';
-
+// delete button
+import DeleteButton from './DeleteButton';
 import { Formik, Form, Field } from 'formik';
+// import for showing toast message s
+
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+// minified version is also included
+// import 'react-toastify/dist/ReactToastify.min.css';
+
 const Yup = require('yup');
 
 class AddCategory extends Component {
+  notify = () => toast.success('Category Succesfully Saved!');
+  deleted = () => toast.success('Category Succesfully Deleted!');
+  error = () => toast.error('Some Error Occured while Saving!');
+
   render() {
     return (
       <React.Fragment>
         {/* Declare Mutation Tag , pass the mutation as function and the mutation result */}
+        <ToastContainer
+          position="bottom-center"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnVisibilityChange
+          draggable
+          pauseOnHover
+        />
 
         <div className="container">
           <div className="row">
             <div class="col-6">
-              {' '}
               <Mutation
                 mutation={ADD_CATEGORY}
                 errorPolicy="all"
-                onError={e => console.log(e.message)}
-                onCompleted={data => console.log(data)}
+                onError={e => {
+                  console.log(e.message);
+                  this.error();
+                }}
+                onCompleted={data => {
+                  console.log(data);
+                  this.notify();
+                }}
                 refetchQueries={['AllCategories']}
               >
                 {(AddCategory, { data, loading, error }) => {
@@ -114,11 +142,7 @@ class AddCategory extends Component {
                           </Form>
                         )}
                       />
-                      {data && (
-                        <div class="alert alert-success" role="alert">
-                          <p>Saved Category</p>
-                        </div>
-                      )}
+
                       {loading && (
                         <div class="alert alert-warning" role="alert">
                           <p>Saving Category</p>
@@ -139,9 +163,7 @@ class AddCategory extends Component {
                 {({ loading, error, data }) => {
                   if (loading) return 'Loading...';
                   if (error) return `Error! ${error.message}`;
-                  {
-                    console.log(data);
-                  }
+
                   return (
                     <div>
                       <ReactTable
@@ -160,16 +182,12 @@ class AddCategory extends Component {
                               },
                               {
                                 id: 'button',
-                                accessor: 'category',
+                                accessor: 'id',
                                 Cell: ({ value }) => (
-                                  <button
-                                    className="btn btn-primary"
-                                    onClick={() => {
-                                      console.log('clicked value', value);
-                                    }}
-                                  >
-                                    Delete
-                                  </button>
+                                  <DeleteButton
+                                    categoryid={value}
+                                    deleted={this.deleted}
+                                  />
                                 )
                               }
                             ]

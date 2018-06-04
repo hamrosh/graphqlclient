@@ -3,6 +3,7 @@ import gql from 'graphql-tag';
 export const GET_CATEGORY_LIST = gql`
   query AllCategories {
     allCategories {
+      id
       category
       createdby
     }
