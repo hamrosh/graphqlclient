@@ -14,7 +14,8 @@ import 'react-table/react-table.css';
 // delete button
 import DeleteButton from './DeleteButton';
 import { Formik, Form, Field } from 'formik';
-// import for showing toast message s
+
+// import for showing toast message
 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -24,9 +25,8 @@ import 'react-toastify/dist/ReactToastify.css';
 const Yup = require('yup');
 
 class AddCategory extends Component {
-  notify = () => toast.success('Category Succesfully Saved!');
-  deleted = () => toast.success('Category Succesfully Deleted!');
-  error = () => toast.error('Some Error Occured while Saving!');
+  notify = msg => toast.success(msg);
+  error = msg => toast.error('Some Error Occured while Saving' + msg);
 
   render() {
     return (
@@ -52,11 +52,11 @@ class AddCategory extends Component {
                 errorPolicy="all"
                 onError={e => {
                   console.log(e.message);
-                  this.error();
+                  this.error(e.message);
                 }}
                 onCompleted={data => {
                   console.log(data);
-                  this.notify();
+                  this.notify('Sucessfully added the Category');
                 }}
                 refetchQueries={['AllCategories']}
               >
@@ -148,11 +148,11 @@ class AddCategory extends Component {
                           <p>Saving Category</p>
                         </div>
                       )}
-                      {error && (
+                      {/* {error && (
                         <div class="alert alert-danger" role="alert">
                           <p> Error{error.message} :( Please try again</p>
                         </div>
-                      )}
+                      )} */}
                     </div>
                   );
                 }}
@@ -186,7 +186,7 @@ class AddCategory extends Component {
                                 Cell: ({ value }) => (
                                   <DeleteButton
                                     categoryid={value}
-                                    deleted={this.deleted}
+                                    notify={this.notify}
                                   />
                                 )
                               }

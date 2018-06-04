@@ -23,7 +23,7 @@ class DeleteButton extends Component {
                       id: this.props.categoryid
                     }
                   });
-                  this.props.deleted();
+                  this.props.notify('Deleted the Category');
                 }}
               >
                 Delete
