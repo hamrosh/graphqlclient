@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 // import for the mutation connection of react and graphql
-import { Mutation, Query } from 'react-apollo';
+import { Mutation, Query, ApolloConsumer } from 'react-apollo';
 // import custom defined mutations
-import { ADD_CATEGORY } from './gql/Mutations';
+import { ADD_CATEGORY, DELETE_CATEGORY } from './gql/Mutations';
 // import custom defined queries
 import { GET_CATEGORY_LIST } from './gql/Queries';
 // import for the form handling api formik which helps us in creating forms in react in a simple way
@@ -11,8 +11,7 @@ import { GET_CATEGORY_LIST } from './gql/Queries';
 import ReactTable from 'react-table';
 //import for react - table css
 import 'react-table/react-table.css';
-// delete button
-import DeleteButton from './DeleteButton';
+
 import { Formik, Form, Field } from 'formik';
 
 // import for showing toast message
@@ -23,7 +22,11 @@ import 'react-toastify/dist/ReactToastify.css';
 // import 'react-toastify/dist/ReactToastify.min.css';
 
 const Yup = require('yup');
-
+const validationSchema = Yup.object().shape({
+  category: Yup.string()
+    .min(2, 'minimum 2 characters long')
+    .required('Required!')
+});
 class AddCategory extends Component {
   notify = msg => toast.success(msg);
   error = msg => toast.error('Some Error Occured while Saving' + msg);
@@ -32,17 +35,6 @@ class AddCategory extends Component {
     return (
       <React.Fragment>
         {/* Declare Mutation Tag , pass the mutation as function and the mutation result */}
-        <ToastContainer
-          position="bottom-center"
-          autoClose={3000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnVisibilityChange
-          draggable
-          pauseOnHover
-        />
 
         <div className="container">
           <div className="row">
@@ -64,11 +56,7 @@ class AddCategory extends Component {
                   return (
                     <div>
                       <Formik
-                        validationSchema={Yup.object().shape({
-                          category: Yup.string()
-                            .min(2, 'minimum 2 characters long')
-                            .required('Required!')
-                        })}
+                        validationSchema={validationSchema}
                         onSubmit={(values, actions) => {
                           actions.setSubmitting(true);
                           AddCategory({
@@ -181,13 +169,34 @@ class AddCategory extends Component {
                                 accessor: 'createdby'
                               },
                               {
-                                id: 'button',
+                                id: 'delbutton',
                                 accessor: 'id',
                                 Cell: ({ value }) => (
-                                  <DeleteButton
-                                    categoryid={value}
-                                    notify={this.notify}
-                                  />
+                                  <ApolloConsumer>
+                                    {client => (
+                                      <button
+                                        onClick={() => {
+                                          client
+                                            .mutate({
+                                              mutation: DELETE_CATEGORY,
+                                              variables: { id: value },
+                                              refetchQueries: ['AllCategories']
+                                            })
+                                            .then(resp => {
+                                              console.log(resp);
+                                              this.notify(
+                                                'Sucessfully deleted Category'
+                                              );
+                                            })
+                                            .catch(error => {
+                                              console.log(error);
+                                            });
+                                        }}
+                                      >
+                                        DELETE
+                                      </button>
+                                    )}
+                                  </ApolloConsumer>
                                 )
                               }
                             ]

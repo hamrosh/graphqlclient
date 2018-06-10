@@ -91,3 +91,9 @@ button.outline {
   border: 1px solid #aaa;
   color: #555;
 }
+
+.jumbotron {
+  background-image: url('components/HomeImage/mainback.jpg') !important;
+  background-size: cover;
+  color: #fff;
+}
